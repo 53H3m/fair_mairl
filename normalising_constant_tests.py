@@ -76,7 +76,7 @@ def compute_z(demos):
             pbar.update(1)
 
     Zs_estimates = np.cumsum(np.stack(Zs), axis=0)
-    np.save(f"Z_{seed}_{num_states}_{num_actions}.npy", Zs_estimates)
+    np.save(f"data/Z_{seed}_{num_states}_{num_actions}.npy", Zs_estimates)
 
 
 @tf.function

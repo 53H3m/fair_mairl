@@ -44,7 +44,7 @@ dd = {
 
 for label, runs in data_files.items():
     for runtype, filename in runs.items():
-        with open(filename, "rb") as f:
+        with open(f"data/{filename}", "rb") as f:
             data = np.load(f)
 
         estimated_zs = data[-1] / len(data)
