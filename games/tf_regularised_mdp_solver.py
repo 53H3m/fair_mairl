@@ -243,7 +243,7 @@ def qre_batch_kl_gap_tf_for_reg(
     return tf.maximum(kl1, kl2)
 
 
-def qre_batch_kl_gap_sweep_tf(Q1, Q2, pi1, pi2, transition_matrix, initial_state_dist, gamma, num_regs=10):
+def qre_batch_kl_gap_sweep_tf(Q1, Q2, pi1, pi2, num_regs=10):
     """
     Evaluate QRE batch gap over a range of regularization coefficients.
 
@@ -255,9 +255,7 @@ def qre_batch_kl_gap_sweep_tf(Q1, Q2, pi1, pi2, transition_matrix, initial_state
     Returns:
         gaps: Tensor of shape (num_regs, n) representing the QRE gap for each reg value
     """
-    #regs = tf.linspace(1., 0.05, num_regs)
-    regs = tf.linspace(1., 0.05, num_regs)
-
+    regs = tf.linspace(1., 0.04, num_regs)
 
     # Expand dimensions to broadcast over reg values
     Q1_exp = tf.expand_dims(Q1, axis=0)         # (1, n, s, a, a)
@@ -274,12 +272,7 @@ def qre_batch_kl_gap_sweep_tf(Q1, Q2, pi1, pi2, transition_matrix, initial_state
 
     gap = tf.maximum(kl1, kl2)  # (num_regs, n)
 
-    # visitation = compute_visitation(pi1, pi2, transition_matrix, initial_state_dist, gamma)
-    # kl1 = stable_kl(pi1, logits1)
-    # kl2 = stable_kl(pi2, logits2)
-    # gap = tf.maximum(tf.reduce_sum(kl1 * visitation, axis=-1), tf.reduce_sum(kl2 * visitation, axis=-1))
-
-    c = 6. # 6.
+    c = 6.
     optimality_exps = tf.math.exp(-c * tf.concat([[100.], regs], axis=0))
     optimality_probs = optimality_exps[1:] - optimality_exps[:-1]
     return gap, optimality_probs

@@ -268,7 +268,7 @@ def _train_reward(
                     gamma,
                 )
 
-                qre_gap, optimality_probs = qre_batch_kl_gap_sweep_tf(Q1, Q2, pi_1, pi_2, mdp.transition_matrix, mdp.initial_state_dist, gamma, num_regs=20)
+                qre_gap, optimality_probs = qre_batch_kl_gap_sweep_tf(Q1, Q2, pi_1, pi_2, num_regs=20)
                 likelihoods = tf.reduce_sum(tf.math.exp(-qre_gap * 15.) * tf.expand_dims(optimality_probs, axis=1), axis=0)
                 loglikelihoods = tf.math.log(likelihoods + 1e-16)
 
