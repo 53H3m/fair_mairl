@@ -1,0 +1,12 @@
+dm_tree~=0.1.9
+dm_sonnet~=2.0.2
+tensorflow~=2.18.0
+numpy~=2.0.2
+gymnasium~=1.0.0
+imageio~=2.37.0
+matplotlib~=3.10.0
+tqdm~=4.67.1
+seaborn~=0.13.2
+pandas~=2.2.3
+tf_keras~=2.18.0
+scipy~=1.15.2
