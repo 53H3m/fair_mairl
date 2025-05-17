@@ -1,5 +1,6 @@
 from typing import NamedTuple
 
+import sonnet as snt
 import tensorflow as tf
 
 
