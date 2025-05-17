@@ -388,7 +388,7 @@ def build_from_layout(layout_name: str):
     return s_0, s_i, transition_matrix, base_reward_func1, base_reward_func2, state_meanings, state_swaps
 
 def get_mdp_for_layout(layout_name):
-    path = f"mdp/compiled_{layout_name}.pkl"
+    path = f"data/compiled_{layout_name}.pkl"
     if os.path.exists(path):
         with open(path, "rb") as f:
             ret = pickle.load(f)
