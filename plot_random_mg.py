@@ -18,11 +18,14 @@ sns.set_theme(style="white", rc={
     "xtick.bottom": True, "ytick.left": True,
 })
 
-# Must plot
-# relative fairness ?
-
-gaps = ["PSG", "MNIG"]
-samplings = ["ULA", "MH"]
+gaps = [
+    "PSG",
+    "NIG"
+]
+samplings = [
+    "ULA",
+    "MH"
+]
 seeds = range(10)
 
 traj_pools = [
@@ -154,10 +157,9 @@ def eval_fairness(first_two=True):
 
     palette = sns.color_palette("hls", 6)
 
-
     df = pandas.DataFrame(data)
 
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(20, 6), gridspec_kw={'wspace': 0.2})
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(30, 6), gridspec_kw={'wspace': 0.2})
     # --- Plot 1: Fairness Error ---
     df['fairness_error_scaled'] = df['fairness_error'] / (2 * 2 / 3)
 
@@ -166,13 +168,12 @@ def eval_fairness(first_two=True):
         x="num_traj",
         y="fairness_error_scaled",
         hue="label",
-        errorbar=None,  # "se",
-        err_style="bars",
+        errorbar="se",
+        err_style="band",
         linewidth=1.5,
         palette=palette,
         style="Ablation",
         ax=ax1,
-        err_kws={'capsize': 2},
         markers=True,
     )
     ax1.set_xscale("log")
@@ -182,32 +183,33 @@ def eval_fairness(first_two=True):
     ax1.set_xticks(ticks, tick_labels)
     ax3.tick_params(labelsize=15)
     ax1.legend_.remove()
+    ax1.set_ylim(0., 1.6)
     df['relative_fairness_error_scaled'] = df['relative_fairness_error'] / (2.5)
 
-    # sns.lineplot(
-    #     data=df,
-    #     x="num_traj",
-    #     y="relative_fairness_error_scaled",
-    #     hue="label",
-    #     errorbar=None,#"se",
-    #     err_style="bars",
-    #     linewidth=1.5,
-    #     palette=palette,
-    #     style="Ablation",
-    #     ax=ax2,
-    #     err_kws={'capsize': 2},
-    #     markers=True,
-    # )
-    # #ax2.hlines(2.5, xmin=3, xmax=3 * 128, color="black", linestyle=":", label="Random", linewidth=1.5)
-    # ax2.set_xscale("log")
-    # # ax1.set_yscale("log")
-    # ax2.set_xlabel("Total Number of Trajectories", fontsize=18, labelpad=6)
-    # ax2.set_ylabel("Relative Fairness Error", fontsize=18, labelpad=4)
-    # ax2.grid(True, linestyle='--', linewidth=0.8, alpha=0.7)
-    # ax2.set_xticks(ticks, tick_labels)
-    # yticks = [0.1, 0.3, 0.5, 0.7, 1]
-    # # ax1.set_yticks(yticks, [str(ytick) for ytick in yticks])
-    # ax2.legend_.remove()
+    sns.lineplot(
+        data=df,
+        x="num_traj",
+        y="relative_fairness_error_scaled",
+        hue="label",
+        errorbar="se",
+        err_style="band",
+        linewidth=1.5,
+        palette=palette,
+        style="Ablation",
+        ax=ax2,
+        markers=True,
+    )
+    #ax2.hlines(2.5, xmin=3, xmax=3 * 128, color="black", linestyle=":", label="Random", linewidth=1.5)
+    ax2.set_xscale("log")
+    # ax1.set_yscale("log")
+    ax2.tick_params(labelsize=15)
+    ax2.set_xlabel("Total Number of Trajectories", fontsize=21, labelpad=4)
+    ax2.set_ylabel("Relative Fairness Error", fontsize=21, labelpad=4)
+    ax2.grid(True, linestyle='--', linewidth=0.8, alpha=0.7)
+    ax2.set_xticks(ticks, tick_labels)
+    ax2.legend_.remove()
+    ax2.set_ylim(0., 1.6)
+
 
     df['base_reward_error_scaled'] = df['base_reward_error'] / (5 * 3 / 3)
     # --- Plot 2: Base Reward Error ---
@@ -216,13 +218,13 @@ def eval_fairness(first_two=True):
         x="num_traj",
         y="base_reward_error_scaled",
         hue="label",
-        errorbar=None,  #"se",
-        err_style="bars",
+        errorbar="se",
+        err_style="band",
         linewidth=1.5,
         palette=palette,
         style="Ablation",
         ax=ax3,
-        err_kws={'capsize': 2.},
+        #err_kws={'capsize': 2.},
         markers=True,
     )
     ax3.tick_params(labelsize=15)
@@ -231,18 +233,19 @@ def eval_fairness(first_two=True):
     ax3.set_ylabel("Absolute Intrinsic Rewards Error", fontsize=21, labelpad=6)
     ax3.grid(True, linestyle='--', linewidth=0.8, alpha=0.7)
     ax3.set_xticks(ticks, tick_labels)
+    ax3.set_ylim(0., 2.6)
 
     ax3.legend_.remove()
 
     handles, labels = ax1.get_legend_handles_labels()
-    handles.pop(0)
-    labels.pop(0)
-
-    handles.pop(-3)
-    labels.pop(-3)
+    # handles.pop(0)
+    # labels.pop(0)
+    #
+    # handles.pop(-3)
+    # labels.pop(-3)
 
     ax1.minorticks_off()
-    #ax2.minorticks_off()
+    ax2.minorticks_off()
     ax3.minorticks_off()
 
     fig.legend(handles, labels, loc='upper center', ncol=10, frameon=True, fontsize=18, labelspacing=0, columnspacing=0.8)

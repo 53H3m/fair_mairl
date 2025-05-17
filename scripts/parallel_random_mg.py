@@ -11,7 +11,6 @@ posteriors = [
 ]
 gaps = [
     "PSG", "NIG",
-    #"NIG"
 ]
 samplings = ["ULA", "MH"]
 seeds = range(10)
