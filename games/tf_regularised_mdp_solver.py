@@ -7,7 +7,7 @@ def compute_soft_nash_equilibrium_tf(
         gamma=0.99,
         lambda_reg=0.1,
         damping=0.05,
-        iters=500, # 200
+        iters=500,
 ):
     shape = tf.shape(transition_matrix)
     num_states = shape[0]
@@ -30,9 +30,6 @@ def compute_soft_nash_equilibrium_tf(
 
             EQ_1 = tf.reduce_sum(Q_1 * exp_policy_2, axis=2)
             EQ_2 = tf.reduce_sum(Q_2 * exp_policy_1, axis=1)
-
-            # EQ_1 = EQ_1 - tf.reduce_max(EQ_1, axis=1)
-            # EQ_2 = EQ_2 - tf.reduce_max(EQ_2, axis=1)
 
             policy_1 = tf.nn.softmax(EQ_1 / lambda_reg, axis=1) * damping + policy_1 * (1. - damping)
             policy_2 = tf.nn.softmax(EQ_2 / lambda_reg, axis=1) * damping + policy_2 * (1. - damping)
@@ -114,8 +111,8 @@ def compute_batch_best_response_tf(
         R_1,
         policy_2,
         gamma=0.99,
-        iters=128, # 128
-        lambda_reg=0.05,
+        iters=128,
+        lambda_reg=0.04,
         damping=1.,
 ):
     shape = tf.shape(transition_matrix)
@@ -133,9 +130,8 @@ def compute_batch_best_response_tf(
         for _ in tf.range(iters):
 
             Q_1 = R_1 + gamma * tf.einsum("xabs,ns->nxab", transition_matrix, V_1)
-            #Q_1 = R_1 + gamma * tf.linalg.matvec(transition_matrix, V_1)
 
-            # Q_1 (n, s, a1, a_2)
+
             EQ_1 = tf.reduce_sum(Q_1 * exp_policy_2, axis=3)
 
             policy_1 = tf.nn.softmax(EQ_1 / lambda_reg, axis=2) * damping + policy_1 * (1. - damping)
@@ -225,17 +221,9 @@ def qre_batch_kl_gap_tf_for_reg(
         reg,
         #transition_matrix, initial_state_dist, gamma,
 ):
-    # Proxy for nash gap under entropy regularisation
-    # essentially: if we find an incentivisation to deviate, this means we are not close to a QRE.
-    # Qs and policies are batched, ie the shape of pi1 is (n, s, a)
     logits1 = tf.reduce_sum(tf.expand_dims(pi2, axis=2) * Q1, axis=3) / reg
     logits2 = tf.reduce_sum(tf.expand_dims(pi1, axis=3) * Q2, axis=2) / reg
 
-    # visitation = compute_visitation(pi1, pi2, transition_matrix, initial_state_dist, gamma)
-    #
-    # kl1 = stable_kl(pi1, logits1)
-    # kl2 = stable_kl(pi2, logits2)
-    # return tf.reduce_sum(tf.maximum(kl1, kl2) * visitation, axis=-1)
 
     kl1 = tf.reduce_mean(stable_kl(pi1, logits1), axis=-1)
     kl2 = tf.reduce_mean(stable_kl(pi2, logits2), axis=-1)
@@ -255,6 +243,7 @@ def qre_batch_kl_gap_sweep_tf(Q1, Q2, pi1, pi2, num_regs=10):
     Returns:
         gaps: Tensor of shape (num_regs, n) representing the QRE gap for each reg value
     """
+    
     regs = tf.linspace(1., 0.04, num_regs)
 
     # Expand dimensions to broadcast over reg values
@@ -294,7 +283,7 @@ def compute_batch_q_tf(
     V_2 = tf.zeros([n, num_states], dtype=tf.float32)
     R_1 = tf.expand_dims(R_1, axis=0)
     R_2 = tf.expand_dims(R_2, axis=0)
-    #transition_matrix = tf.expand_dims(transition_matrix, axis=0)
+
 
     def policy_eval(V_1, V_2, policy_1, policy_2):
 
